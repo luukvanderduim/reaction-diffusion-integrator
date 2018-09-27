@@ -1,4 +1,10 @@
+#![allow(dead_code)]
+#[macro_use]
+extern crate serde_derive;
+
 extern crate rand;
+extern crate serde;
+extern crate serde_yaml;
 
 mod frame;
 mod modulo;
@@ -8,7 +14,10 @@ use rand::distributions::normal::StandardNormal;
 use convolution::laplace;
 use frame::Periodic2DFrame;
 
-use std::iter::Sum;
+use std::fs::File;
+use std::io::prelude::*;
+
+//use std::iter::Sum;
 
 fn print_matrix(frame: &Periodic2DFrame, data: &[f64])
 {
@@ -21,6 +30,25 @@ fn print_matrix(frame: &Periodic2DFrame, data: &[f64])
             _ => panic!("error")
         }
     }
+}
+#[derive(Serialize, Deserialize, Debug)]
+struct P2DFrame {
+      width: u64,
+      height: u64,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct ConfigHierarchy {
+    p2df: P2DFrame,
+}
+
+
+fn read_preferences() -> Result<String, std::io::Error> { //canonical propagation of Error Result
+
+    let mut prefstr = String::new();
+    File::open("rdi-prefs.yaml")?.read_to_string(&mut prefstr )?;
+
+    Ok(prefstr)
 }
 
 fn std(x: &[f64]) -> f64
@@ -57,7 +85,11 @@ fn white_noise(x: &mut [f64], sigma: f64)
 */
 
 fn main() {
-    let frame = Periodic2DFrame { width: 128, height: 128 };
+    let s = read_preferences().expect("Cannot read rdi-prefs.yaml file.");
+    let c: ConfigHierarchy =  serde_yaml::from_str(&s).expect("Cannot parse yaml file into preferences.");
+
+
+    let frame = Periodic2DFrame { width: c.p2df.width, height: c.p2df.height };
     let mut u = vec![1.0; frame.size()];
     let mut v = vec![0.0; frame.size()];
     let mut q = vec![0.0; frame.size()];

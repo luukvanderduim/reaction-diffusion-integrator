@@ -1,0 +1,5 @@
+# Reacion-difussion integrator preferences
+---
+p2df:
+  width: 128
+  height: 128
