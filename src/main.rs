@@ -11,13 +11,19 @@ mod modulo;
 mod convolution;
 
 use rand::distributions::normal::StandardNormal;
+use rand::Rng;
+
 use convolution::laplace;
 use frame::Periodic2DFrame;
 
+<<<<<<< HEAD
 use std::fs::File;
 use std::io::prelude::*;
 
 //use std::iter::Sum;
+=======
+// use std::iter::Sum;
+>>>>>>> upstream/master
 
 fn print_matrix(frame: &Periodic2DFrame, data: &[f64])
 {
@@ -51,19 +57,21 @@ fn read_preferences() -> Result<String, std::io::Error> { //canonical propagatio
     Ok(prefstr)
 }
 
-fn std(x: &[f64]) -> f64
-{
-    let s = x.len() as f64;
-    let (a, b) = x.iter().fold(
-        (0., 0.),
-        |(a, b), &x| (a + x*x, b + x));
-    ((a - b*b / s) / s).sqrt()
-}
+// fn std(x: &[f64]) -> f64
+// {
+//     let s = x.len() as f64;
+//     let (a, b) = x.iter().fold(
+//         (0., 0.),
+//         |(a, b), &x| (a + x*x, b + x));
+//     ((a - b*b / s) / s).sqrt()
+// }
 
 fn white_noise(x: &mut [f64], sigma: f64)
 {
+    let mut rng = rand::thread_rng();
+
     for i in 0..x.len() {
-        let StandardNormal(a) = rand::random();
+        let a = rng.sample(StandardNormal);
         x[i] += sigma * a;
     }
 }
